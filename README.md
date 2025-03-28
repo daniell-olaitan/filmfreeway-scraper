@@ -34,6 +34,28 @@ This project is a web scraper designed to extract festival details from [FilmFre
   cd filmfreeway-scraper
 ```
 
+### **Create a Virtual Environment**
+Run the following command to create a virtual environment:
+
+```bash
+python -m venv venv
+```
+
+### **Activate the Virtual Environment**
+
+- **Windows (Command Prompt)**
+```bash
+venv\Scripts\activate
+```
+- **Windows (PowerShell)**
+```powershell
+venv\Scripts\Activate.ps1
+```
+- **Mac/Linux**
+```bash
+source venv/bin/activate
+```
+
 ### **Install Dependencies**
 ```bash
 pip install -r requirements.txt
@@ -108,3 +130,49 @@ The final output is stored in [festivals.jsonl](./festivals.jsonl) and follows t
 
 ## License
 MIT License
+
+
+
+
+
+### **Setting Up a Virtual Environment**
+
+To ensure dependencies are managed properly and avoid conflicts, it's recommended to use a virtual environment. Follow these steps:
+
+#### **1. Create a Virtual Environment**
+Run the following command to create a virtual environment:
+
+```bash
+python -m venv venv
+```
+
+#### **2. Activate the Virtual Environment**
+
+- **Windows (Command Prompt)**
+  ```bash
+  venv\Scripts\activate
+  ```
+- **Windows (PowerShell)**
+  ```powershell
+  venv\Scripts\Activate.ps1
+  ```
+- **Mac/Linux**
+  ```bash
+  source venv/bin/activate
+  ```
+
+#### **3. Install Dependencies**
+After activating the virtual environment, install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+#### **4. Deactivating the Virtual Environment**
+When done, deactivate the virtual environment with:
+
+```bash
+deactivate
+```
+
+This setup ensures that all required packages are installed in an isolated environment, preventing potential conflicts with system-wide dependencies.
