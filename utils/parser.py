@@ -20,13 +20,19 @@ class FestivalDataParser:
             }
         ]
 
-        response = await self._client.chat.complete_async(
-            model=self._model,
-            messages=messages,
-            response_format={
-                "type": "json_object",
-            }
-        )
+        while True:
+            try:
+                response = await self._client.chat.complete_async(
+                    model=self._model,
+                    messages=messages,
+                    response_format={
+                        "type": "json_object",
+                    }
+                )
+
+                break
+            except Exception:
+                self.logger.logger.debug("Retrying to extract data: %s")
 
         content = response.choices[0].message.content
         self.logger.logger.info("Extracted: %s", content)

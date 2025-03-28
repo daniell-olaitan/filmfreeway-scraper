@@ -106,6 +106,7 @@ class FestivalScraper:
             saved_urls = self.saver.read('urls.jsonl')[0]
         else:
             saved_urls = await self._fetch_page_urls(start_url)
+            self.saver.save([saved_urls])
 
         urls = list(saved_urls.values())
         names = list(saved_urls.keys())
