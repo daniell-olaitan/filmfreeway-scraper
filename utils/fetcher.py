@@ -28,7 +28,6 @@ class PageFetcher:
         browser_type: BrowserType = getattr(playwright, browser_type)
         browser = await browser_type.launch(headless=False)
 
-
         fetcher = cls(max_retries)
         fetcher.browser = browser
 
@@ -41,8 +40,16 @@ class PageFetcher:
                 page: Page = await self.browser.new_page()
                 await page.goto(url, timeout=30000)
                 await page.wait_for_load_state('domcontentloaded', timeout=30000)
+                if await page.title() == 'Just a moment...':
+                    await page.goto(url.rsplit('/', 1)[0], timeout=30000)
+                    await page.wait_for_load_state('domcontentloaded', timeout=30000)
+
+                    await page.close()
+                    continue
+
                 break
-            except Exception:
+            except Exception as e:
+                self.logger.logger.debug("Error: %s", e)
                 self.logger.logger.debug("Retrying to fetch page at: %s\n", url)
                 await page.close()
 

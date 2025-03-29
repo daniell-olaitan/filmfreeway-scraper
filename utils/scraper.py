@@ -9,6 +9,7 @@ from utils.saver import DataSaver
 from utils.fetcher import PageFetcher
 from utils.parser import FestivalDataParser
 from utils.validator import FestivalDataValidator
+from utils.data_models import DEADLINE_PROMPT, DETAILS_PROMPT
 
 
 class FestivalScraper:
@@ -29,7 +30,7 @@ class FestivalScraper:
         self.logger = Logger('Scraper')
 
     async def _fetch_page_urls(self, start_url: str) -> dict[str, str]:
-        urls = {}
+        urls = []
         next_url = start_url
         while True:
             page = await self.fetcher.fetch_page(next_url)
@@ -50,7 +51,9 @@ class FestivalScraper:
             view_urls = [urljoin(self.base_url, view_url) for view_url in view_urls]
 
             name_urls = dict(zip(names, view_urls))
-            urls.update(name_urls)
+            name_urls = [{k: v} for k, v in dict(zip(names, view_urls)).items()]
+
+            urls.extend(name_urls)
 
             self.logger.logger.debug("Fetched urls: %s", json.dumps(name_urls))
 
@@ -103,13 +106,13 @@ class FestivalScraper:
 
     async def run(self, start_url: str):
         if os.path.exists('urls.jsonl'):
-            saved_urls = self.saver.read('urls.jsonl')[0]
+            saved_urls = self.saver.read('urls.jsonl')
         else:
             saved_urls = await self._fetch_page_urls(start_url)
-            self.saver.save([saved_urls])
+            self.saver.save(saved_urls)
 
-        urls = list(saved_urls.values())
-        names = list(saved_urls.keys())
+        urls = [list(entry.values())[0] for entry in saved_urls]
+        names = [list(entry.keys())[0] for entry in saved_urls]
 
         batch_size = 1
         start_index = 0
@@ -125,22 +128,27 @@ class FestivalScraper:
             detail_tasks = [self._fetch_festival_details(page) for page in pages]
             details = await asyncio.gather(*detail_tasks)
 
-            deadlines = [self._parse_deadlines(deadline[1]) for deadline in details]
-
             festival_details_tasks = [
-                self.parser.exctract_details(detail[0])
+                self.parser.exctract_details(DETAILS_PROMPT, detail[0])
                 for detail in details
             ]
 
             festival_details = await asyncio.gather(*festival_details_tasks)
 
+            deadline_tasks = [
+                self.parser.exctract_details(DEADLINE_PROMPT, detail[1])
+                for detail in details
+            ]
+
+            deadlines = await asyncio.gather(*deadline_tasks)
+
             for j, name in enumerate(names[i:i+batch_size]):
                 festival = {
                     'festival_name': name,
-                    'deadlines': deadlines[j]
+                    'deadlines': deadlines[j]['deadlines']
                 }
 
-                festival.update(festival_details[0])
+                festival.update(festival_details[j])
 
                 item = self.validator.validate_item(festival)
                 if item and self.validator.is_item_unique(item):

@@ -6,17 +6,16 @@ from playwright.async_api import Locator
 
 
 class FestivalDataParser:
-    def __init__(self, *, model: str, message: str, api_key: str):
+    def __init__(self, *, model: str, api_key: str):
         self._model = model
         self.logger = Logger('Parser')
         self._client = Mistral(api_key=api_key)
-        self.message = message
 
-    async def exctract_details(self, data: str) -> dict:
+    async def exctract_details(self, prompt: str, data: str) -> dict:
         messages = [
             {
                 'role': 'user',
-                'content': self.message.format(data=data)
+                'content': prompt.format(data=data)
             }
         ]
 
@@ -42,7 +41,7 @@ class FestivalDataParser:
             return parsed_content
         except json.JSONDecodeError:
             self.logger.logger.error("Failed to parse response as JSON: %s", content)
-            return {}
+            raise
 
 
     async def parse_text_content(self, data: Locator) -> list:

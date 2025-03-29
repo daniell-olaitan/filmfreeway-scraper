@@ -1,6 +1,6 @@
 from typing import NamedTuple
 
-PROMPT = """Extract structured data from the following user input:
+DETAILS_PROMPT = """Extract structured data from the following user input:
 
 {data}
 
@@ -31,6 +31,32 @@ Output Format Example:
   "categories": ["Short", "Experimental", "Documentary", "Fiction"],
   "festival_info": "IWFFT aims to make women directors and their films visible by bringing together female directors and female film workers in the first week of March every year within the scope of 8 March International Working Women's Day.",
   "important_dates": ["8th - 13th February 2025", "15th January 2025"]
+}}
+
+Ensure the extracted data adheres to the specified structure and accurately represents the relevant information.
+Return your response in JSON format.
+"""
+
+DEADLINE_PROMPT = """Extract all deadline dates from the following user input:
+
+{data}
+
+A deadline is any date associated with submission periods, due dates, or cutoff points (e.g., "Early Bird", "Right on Time", "Better Late Than Never", "Not so Early", "Regular", "Extended").
+Do not include opening dates, notification dates, or event dates.
+Return only a semi-colon separated list of deadline dates in chronological order, without labels or explanations.
+It is okay to return empty lists if there are no deadlines in the text.
+
+Example Input:
+March 1, 2025 - Opening Date
+March 31, 2025 - Early Bird
+June 30, 2025 - Right on Time
+July 31, 2025 - Better Late Than Never
+October 17, 2025 - Notification Date
+November 12 - 23, 2025 - Event Date
+
+Expected Output:
+{{
+  "deadlines": ["March 31, 2025", "June 30, 2025", "July 31, 2025"]
 }}
 
 Ensure the extracted data adheres to the specified structure and accurately represents the relevant information.

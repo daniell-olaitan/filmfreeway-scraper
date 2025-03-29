@@ -6,10 +6,10 @@ from utils.logger import Logger
 from utils.saver import DataSaver
 from utils.fetcher import PageFetcher
 from utils.scraper import FestivalScraper
+from utils.data_models import FestivalItem
 from utils.parser import FestivalDataParser
 from utils.validator import FestivalDataValidator
 from playwright.async_api import async_playwright
-from utils.data_models import PROMPT, FestivalItem
 
 BASE_URL = 'https://filmfreeway.com'
 START_URL = "https://filmfreeway.com/festivals?utf8=%E2%9C%93&config%5B%5D=entry_fees&config%5B%5D=years_running&config%5B%5D=runtime&config%5B%5D=submit&has_query=&ga_search_category=Festival&q=&call_for_entries=1&ft_gold=0&ft_gold=1&ft_ff=0&ft_ff=1&ft_sc=0&ft_audio=0&ft_photo=0&ft_oe=0&project_category%5B%5D=5&fees=0%3B100&years=1%3B20&runtime=Any&inside_or_outside_country=0&countries=&completion_date=&entry_deadline_when=0&entry_deadline=&event_date_when=0&event_date=&sort=years"
@@ -26,7 +26,6 @@ async def main():
         validator = FestivalDataValidator(FestivalItem)
         parser = FestivalDataParser(
             model=config('MISTRAL_MODEL'),
-            message=PROMPT,
             api_key=config('MISTRAL_API_KEY')
         )
 

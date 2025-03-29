@@ -16,6 +16,14 @@ This project is a web scraper designed to extract festival details from [FilmFre
   - **Categories** (Festival genres or types).
 - The AI output is validated against the required JSON schema.
 
+### **To ensure completeness and error-free results**
+- The script is designed to **resume from the last scraped page** in case of interruptions.
+- Extracted festival data is validated against the required schema before saving.
+- Handled duplication and edge cases like missing fields.
+- Errors are logged, and failed extractions are retried automatically.
+- Random samples from the dataset were checked against the website.
+- Logs are generated at different levels to track progress and errors.
+
 ---
 
 ## Tech Stack
@@ -107,13 +115,26 @@ python main.py -l WARNING
 ---
 
 ## Testing Approach
-To ensure completeness and error-free results:
-- The script is designed to **resume from the last scraped page** in case of interruptions.
-- Extracted festival data is validated against the required schema before saving.
-- Handled duplication and edge cases like missing fields.
-- Errors are logged, and failed extractions are retried automatically.
-- Random samples from the dataset were checked against the website.
-- Logs are generated at different levels to track progress and errors.
+
+1. **Missing Fields**
+   - Identified entries that only had `festival_name`. This was due to a network issue that prevented the AI agent from receiving the prompt correctly.
+   - Rescraped the affected entries and reprocessed them with the AI to ensure accurate extraction.
+   - Updated the codebase to handle this edge case and retry when a network issue occurs.
+
+2. **Duplicate Information with Different Festival Names**
+   - Found cases where multiple festival names shared the same extracted data. This happened because the scraper fed the AI agent empty input, resulting in default output.
+   - Rescraped the affected entries and ensured proper input was fed to the AI.
+   - Adjusted the codebase to prevent empty inputs from being processed.
+
+3. **Incomplete Deadlines**
+   - Some deadline dates were missed because my heuristic initially looked for the keyword `"Deadline"` in date fields. However, some festivals used variations like `"Late"`, `"Extended"`, `"Regular"` without adding `"Deadline"` to the words.
+   - Addressed this by sending the raw text to the AI with a refined prompt to ensure all deadline variations were captured.
+   - Modified the scraper to account for different deadline formats in future runs.
+
+4. **Duplicate Entries Check**
+   - After merging the corrected outputs, I performed a final check to ensure there were no duplicate festival entries.
+   - Any duplicates found were filtered out, leaving only unique records.
+   - Merged the corrected outputs with the original dataset.
 
 ---
 
@@ -130,49 +151,3 @@ The final output is stored in [festivals.jsonl](./festivals.jsonl) and follows t
 
 ## License
 MIT License
-
-
-
-
-
-### **Setting Up a Virtual Environment**
-
-To ensure dependencies are managed properly and avoid conflicts, it's recommended to use a virtual environment. Follow these steps:
-
-#### **1. Create a Virtual Environment**
-Run the following command to create a virtual environment:
-
-```bash
-python -m venv venv
-```
-
-#### **2. Activate the Virtual Environment**
-
-- **Windows (Command Prompt)**
-  ```bash
-  venv\Scripts\activate
-  ```
-- **Windows (PowerShell)**
-  ```powershell
-  venv\Scripts\Activate.ps1
-  ```
-- **Mac/Linux**
-  ```bash
-  source venv/bin/activate
-  ```
-
-#### **3. Install Dependencies**
-After activating the virtual environment, install the required dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-#### **4. Deactivating the Virtual Environment**
-When done, deactivate the virtual environment with:
-
-```bash
-deactivate
-```
-
-This setup ensures that all required packages are installed in an isolated environment, preventing potential conflicts with system-wide dependencies.
